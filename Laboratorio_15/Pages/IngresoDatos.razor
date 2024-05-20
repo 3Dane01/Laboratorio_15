@@ -1,0 +1,93 @@
+﻿@page "/"
+
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavigationManager
+<h1>Ingreso de Datos</h1>
+
+<EditForm Model="@animal" OnValidSubmit="@Guardar">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label for="NombreAnimal">Nombre del Animal: </label>
+        <InputText id="NombreAnimal" @bind-Value="animal.NombreAnimal" class="form-control" />
+        <ValidationMessage For="() => animal.NombreAnimal" />
+    </div>
+    <div>
+        <label for="Especie">Especie: </label>
+        <InputText id="Especie" @bind-Value="animal.Especie" class="form-control" />
+        <ValidationMessage For="() => animal.Especie" />
+    </div>
+    <div>
+        <label for="TipoAlimentacion">Tipo de Alimentacion: </label>
+        <InputText id="TipoAlimentacion" @bind-Value="animal.TipoAlimentacion" class="form-control" />
+        <ValidationMessage For="() => animal.TipoAlimentacion" />
+    </div>
+    <div>
+        <label for="TiempoMaximaVida">Tiempo Maxima de Vida: </label>
+        <InputText id="TiempoMaximaVida" @bind-Value="animal.TiempoMaximaVida" class="form-control" />
+        <ValidationMessage For="() => animal.TiempoMaximaVida" />
+    </div>    
+    <div class="form-group">
+        <button type="submit" class="btn btn-danger">Guardar</button>
+    </div>
+</EditForm>
+
+@if (listaAnimales != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre Animal</th>
+                <th>Especie</th>
+                <th>Tipo de Alimentacion</th>
+                <th>Tiempo Maximo de Vida</th>
+                <th>Editar</th>
+                <th>Borrar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var CualquierAnimal in listaAnimales)
+            {
+                <tr>
+                    <td>@CualquierAnimal.NombreAnimal</td>
+                    <td>@CualquierAnimal.Especie</td>
+                    <td>@CualquierAnimal.TipoAlimentacion</td>
+                    <td>@CualquierAnimal.TiempoMaximaVida</td>
+                    <td><button class="btn btn-warning" @onclick="@(() => NavigationManager.NavigateTo($"/AnimalesEditar/{CualquierAnimal.NombreAnimal}"))">editar</button></td>
+                    <td><button class="btn btn-danger" @onclick="@(() => Borrar(CualquierAnimal.NombreAnimal))">Borrar</button></td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code{
+    claseAnimales animal = new claseAnimales();
+    List<claseAnimales> listaAnimales = new List<claseAnimales>();
+    protected async Task Guardar()
+    {
+        listaAnimales.Add(animal);
+        animal = new claseAnimales();
+
+        await localStorage.SetItemAsync("listaAnimales", listaAnimales);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        listaAnimales = await localStorage.GetItemAsync<List<claseAnimales>>("listaAnimales");
+
+        if (listaAnimales == null)
+        {
+            listaAnimales = new List<claseAnimales>();
+        }
+
+    }
+    protected async Task Borrar(string nombre)
+    {
+        listaAnimales.Remove(listaAnimales.First(c => c.NombreAnimal == nombre));
+        await localStorage.SetItemAsync("listaAnimales", listaAnimales);
+    }
+}
+
+
+

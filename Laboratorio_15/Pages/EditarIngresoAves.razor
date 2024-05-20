@@ -1,0 +1,69 @@
+﻿@page "/AvesEditar/{nombre}"
+<h1>Ingrese de Datos de Aves</h1>
+
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavigationManager
+
+<EditForm Model="@animalAves" OnValidSubmit="@GuardarAves">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label for="NombreAnimal">Nombre del Animal: </label>
+        <InputText id="NombreAnimal" @bind-Value="animalAves.NombreAnimal" class="form-control" />
+        <ValidationMessage For="() => animalAves.NombreAnimal" />
+    </div>
+    <div>
+        <label for="Especie">Especie: </label>
+        <InputText id="Especie" @bind-Value="animalAves.Especie" class="form-control" />
+        <ValidationMessage For="() => animalAves.Especie" />
+    </div>
+    <div>
+        <label for="TipoAlimentacion">Tipo de Alimentacion: </label>
+        <InputText id="TipoAlimentacion" @bind-Value="animalAves.TipoAlimentacion" class="form-control" />
+        <ValidationMessage For="() => animalAves.TipoAlimentacion" />
+    </div>
+    <div>
+        <label for="TiempoMaximaVida">Tiempo Maxima de Vida: </label>
+        <InputText id="TiempoMaximaVida" @bind-Value="animalAves.TiempoMaximaVida" class="form-control" />
+        <ValidationMessage For="() => animalAves.TiempoMaximaVida" />
+    </div>
+
+    <div>
+        <label for="Vuela">El animal vuela: </label>
+        <InputText id="Vuela" @bind-Value="animalAves.Vuela" class="form-control" />
+        <ValidationMessage For="() => animalAves.Vuela" />
+    </div>
+
+    <div>
+        <label for="PeriodoIncubacion">Periodo de Incubacion: </label>
+        <InputText id="PeriodoIncubacion" @bind-Value="animalAves.PeriodoIncubacion" class="form-control" />
+        <ValidationMessage For="() => animalAves.PeriodoIncubacion" />
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-danger">Guardar</button>
+    </div>
+</EditForm>
+
+@code {
+    ClaseAnimalAves animalAves = new ClaseAnimalAves();
+    List<ClaseAnimalAves> listaAnimalesAves = new List<ClaseAnimalAves>();
+    [Parameter]
+    public string nombre { get; set; }
+    protected async Task GuardarAves()
+    {
+        await localStorage.SetItemAsync("listaAnimalesAves", listaAnimalesAves);
+        NavigationManager.NavigateTo("/IngresoAves");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        listaAnimalesAves = await localStorage.GetItemAsync<List<ClaseAnimalAves>>("listaAnimalesAves");
+
+        if (listaAnimalesAves == null)
+        {
+            listaAnimalesAves = new List<ClaseAnimalAves>();
+        }
+        animalAves = listaAnimalesAves.FirstOrDefault(c => c.NombreAnimal == nombre);
+    }
+    
+}
